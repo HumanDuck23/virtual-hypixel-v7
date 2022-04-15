@@ -1,8 +1,17 @@
 <template>
-  Hi
+  <v-app>
+    <v-main>
+      Hi
+    </v-main>
+  </v-app>
 </template>
-<script>
 
+<script>
+export default {
+  name: 'App',
+
+  data: () => ({
+    //
+  }),
+}
 </script>
-<style>
-</style>
