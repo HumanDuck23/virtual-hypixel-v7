@@ -1,7 +1,6 @@
 <template>
-  <v-app>
+  <v-app style="height: 100vh">
     <v-main>
-      Hi
     </v-main>
   </v-app>
 </template>
@@ -15,3 +14,8 @@ export default {
   }),
 }
 </script>
+<style>
+#app {
+  height: 100vh;
+}
+</style>
