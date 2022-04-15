@@ -8,7 +8,7 @@
             <v-container fluid>
               <v-row>
                 <v-col cols="3">
-                  <v-img :src="serverConfig.favicon" width="200"></v-img>
+                  <v-img :src="serverConfig.favicon" width="200" id="serverFavicon"></v-img>
                 </v-col>
                 <v-col cols="9">
                   <v-text-field
@@ -43,6 +43,14 @@
               </v-row>
             </v-container>
           </v-card-text>
+          <v-card-actions>
+            <v-btn elevation="1" @click="makeDuckIcon">
+              <v-icon class="mr-2">
+                mdi-duck
+              </v-icon>
+              Make the icon a duck
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -71,13 +79,44 @@ export default {
     }
   },
 
+  methods: {
+    makeDuckIcon() {
+      fetch("http://localhost:6969/randomDuck")
+          .then(res => res.text())
+          .then(text => {
+            // text is a base64 string, resize it to 64x64
+            const img = new Image()
+            img.src = text
+            img.onload = () => {
+              const canvas = document.createElement("canvas")
+              canvas.width = 64
+              canvas.height = 64
+              const ctx = canvas.getContext("2d")
+              ctx.drawImage(img, 0, 0, 64, 64)
+              this.serverConfig.favicon = canvas.toDataURL()
+              // for some reason the image starts to fade so i have this to fix that
+              setTimeout(() => {
+                for (let child of document.querySelector("#serverFavicon").children) {
+                  if (child.tagName === "IMG") {
+                    child.classList.remove("fade-transition-leave-to")
+                  }
+                }
+              }, 50)
+            }
+          })
+          .catch(err => {
+            console.error(err)
+          })
+    }
+  },
+
   watch: {
-   serverConfig: {
-     handler() {
-       localStorage.setItem("serverConfig", JSON.stringify(this.serverConfig))
-     },
-     deep: true
-   }
+    serverConfig: {
+      handler() {
+        localStorage.setItem("serverConfig", JSON.stringify(this.serverConfig))
+      },
+      deep: true
+    }
   }
 }
 </script>
