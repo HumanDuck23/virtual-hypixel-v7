@@ -11,6 +11,7 @@
         <v-spacer/>
         <v-btn icon="mdi-brightness-4" @click="toggleTheme">Hi</v-btn>
       </v-app-bar>
+      <router-view />
     </v-main>
   </v-app>
 </template>
