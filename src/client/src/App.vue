@@ -9,6 +9,10 @@
           Virtual Hypixel
         </v-app-bar-title>
         <v-spacer/>
+        <v-btn icon="mdi-view-dashboard-outline" to="/"></v-btn>
+        <v-btn icon="mdi-package-variant-closed" to="/modules"></v-btn>
+        <v-btn icon="mdi-cog-outline" to="/settings"></v-btn>
+        |
         <v-btn icon="mdi-brightness-4" @click="toggleTheme">Hi</v-btn>
       </v-app-bar>
       <router-view />
