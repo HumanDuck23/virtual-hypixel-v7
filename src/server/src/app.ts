@@ -1,9 +1,12 @@
-import * as fs from "fs"
-
 const express = require("express")
-const axios = require("axios")
-
 const app = express()
+
+const axios = require("axios")
+const http = require("http")
+const server = http.createServer(app)
+const { Server } = require("socket.io")
+const io = new Server(server, { cors: { origin: "http://localhost:3000" } })
+
 const port = 6969
 
 app.use(function (req: any, res: any, next: any) {
@@ -23,6 +26,17 @@ app.get("/randomDuck", (req: any, res: any) => {
         })
 })
 
-app.listen(port, () => {
+io.on("connection", (socket: any) => {
+    console.log("connected")
+    socket.on("disconnect", () => {
+        console.log("disconnected")
+    })
+
+    socket.on("startProxy", (config: any) => {
+        // Start the proxy here
+    })
+})
+
+server.listen(port, () => {
     console.log(`Server listening on port ${port}`)
 })

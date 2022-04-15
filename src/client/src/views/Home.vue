@@ -53,11 +53,23 @@
           </v-card-actions>
         </v-card>
       </v-col>
+      <v-col cols="12" sm="12" md="6" lg="6" xl="6">
+        <v-card>
+          <v-card-title>Proxy Status</v-card-title>
+          <v-card-text>
+            <v-card color="green" @click="startProxy" v-if="!proxy.started">
+              <v-card-text class="text-white text-center text-h6">START</v-card-text>
+            </v-card>
+          </v-card-text>
+        </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
+import * as io from "socket.io-client"
+
 export default {
   name: "Home",
 
@@ -67,10 +79,16 @@ export default {
       motd: "Virtual Hypixel",
       port: 25565,
       maxPlayers: 69
-    }
+    },
+    proxy: {
+      started: false,
+      startedAt: 0,
+    },
+    socket: null
   }),
 
   mounted() {
+    this.socket = io.io("http://localhost:6969")
     if (localStorage.getItem("serverConfig")) {
       this.serverConfig = JSON.parse(localStorage.getItem("serverConfig"))
     }
@@ -107,6 +125,12 @@ export default {
           .catch(err => {
             console.error(err)
           })
+    },
+
+    startProxy() {
+      if (this.socket !== null) {
+        this.socket.emit("startProxy", { test: 1 })
+      }
     }
   },
 
