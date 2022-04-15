@@ -20,7 +20,7 @@ const darkTheme = {
     dark: true,
     colors: {
         background: "#393939",
-        surface: "#393939",
+        surface: "#4e4e4e",
         primary: "#5d25fd",
         secondary: "#4056F4",
         accent: "#FFFD82"
