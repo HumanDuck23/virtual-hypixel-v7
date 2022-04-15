@@ -10,7 +10,7 @@ const lightTheme = {
     colors: {
         background: "#fff",
         surface: "#fff",
-        primary: "#470FF4",
+        primary: "#5d25fd",
         secondary: "#4056F4",
         accent: "#FFFD82"
     }
@@ -21,7 +21,7 @@ const darkTheme = {
     colors: {
         background: "#393939",
         surface: "#393939",
-        primary: "#470FF4",
+        primary: "#5d25fd",
         secondary: "#4056F4",
         accent: "#FFFD82"
     }
