@@ -5,7 +5,7 @@
         <v-col cols="1">
           <v-btn icon="mdi-chevron-left" color="accent" to="/modules"></v-btn>
         </v-col>
-        <v-col cols="11" v-if="module.manifest !== undefined" class="ml-n8 mt-n3">
+        <v-col cols="11" v-if="module.manifest !== undefined" class="mt-n3">
           <v-card-title>
             {{ module.manifest.name }}
           </v-card-title>
