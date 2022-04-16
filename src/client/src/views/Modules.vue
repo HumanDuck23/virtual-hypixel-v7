@@ -74,6 +74,21 @@ export default {
     } else {
       console.error("socket doesnt exist")
     }
+  },
+
+  methods: {
+    saveModuleConfig() {
+      localStorage.setItem("moduleConfigs", JSON.stringify(this.moduleConfigs))
+    }
+  },
+
+  watch: {
+    moduleConfigs: {
+      handler: function() {
+        this.saveModuleConfig()
+      },
+      deep: true
+    }
   }
 }
 </script>
