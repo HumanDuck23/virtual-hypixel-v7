@@ -11,6 +11,15 @@ export interface VirtualHypixelConfig {
             username: string,
             email: string,
             password: string
-        }[]
+        }[],
+        modules: {
+            path: string
+        }
+    },
+
+    moduleConfigs: {
+        [key: string]: {
+            [key: string]: any
+        }
     }
 }
