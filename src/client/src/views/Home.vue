@@ -124,7 +124,7 @@ export default {
     },
 
     startProxy() {
-      if (window.socket !== null) {
+      if (window.socket !== undefined) {
         window.socket.emit("startProxy", { test: 1 })
       }
     }
