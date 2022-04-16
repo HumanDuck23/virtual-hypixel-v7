@@ -31,7 +31,7 @@
               </v-card-text>
               <v-card-actions class="mt-n10">
                 <v-spacer/>
-                <v-btn icon="mdi-delete-outline" color="error" @click="deleteAccount(index)"></v-btn>
+                <v-btn icon="mdi-delete-outline" color="error" @click="toDelete = index; confirmDeleteDialog = true"></v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -42,6 +42,20 @@
       <v-btn elevation="1" block @click="addAccount">Add Account</v-btn>
     </v-card-actions>
   </v-card>
+
+  <v-dialog v-model="confirmDeleteDialog">
+    <v-card max-width="300">
+      <v-card-title>Remove Account</v-card-title>
+      <v-card-text>
+        Are you sure you want to remove the account <b v-if="toDelete >= 0">{{ settings.accounts[toDelete].username }}</b>?
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="confirmDeleteDialog = false">Cancel</v-btn>
+        <v-btn elevation="1" text @click="deleteAccount">Remove</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -59,6 +73,8 @@ export default {
       ]
     },
 
+    confirmDeleteDialog: false,
+    toDelete: -1,
     typePassword: true
   }),
 
@@ -76,8 +92,12 @@ export default {
         password: ""
       })
     },
-    deleteAccount(index) {
-      this.settings.accounts.splice(index, 1)
+    deleteAccount() {
+      if (this.toDelete >= 0) {
+        this.settings.accounts.splice(this.toDelete, 1)
+        this.toDelete = -1
+        this.confirmDeleteDialog = false
+      }
     }
   },
 
@@ -93,5 +113,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>
