@@ -58,8 +58,41 @@
           <v-card-title>Proxy Status</v-card-title>
           <v-card-text>
             <v-card color="green" @click="startProxy" v-if="!proxy.started">
-              <v-card-text class="text-white text-center text-h6">START</v-card-text>
+              <v-card-text class="text-white text-center text-h6">
+                <span v-if="!proxy.loading">
+                  START
+                </span>
+                <v-progress-circular indeterminate="true" v-else></v-progress-circular>
+              </v-card-text>
             </v-card>
+            <v-container fluid v-else>
+              <v-row>
+                <v-col cols="12" sm="4" md="4">
+                  <v-card color="green">
+                    <v-card-text class="text-white text-center text-h6">
+                      Uptime<br>
+                      {{ proxy.startedAtHumanized }}
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                <v-col cols="12" sm="4" md="4">
+                  <v-card color="secondary">
+                    <v-card-text class="text-white text-center text-h6">
+                      localhost:<br>
+                      {{ serverConfig.port }}
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                <v-col cols="12" sm="4" md="4">
+                  <v-card color="error" @click="stopProxy">
+                    <v-card-text class="text-white text-center text-h6">
+                      Click to<br>
+                      stop
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-container>
           </v-card-text>
         </v-card>
       </v-col>
@@ -81,6 +114,8 @@ export default {
     proxy: {
       started: false,
       startedAt: 0,
+      loading: false,
+      startedAtHumanized: ""
     },
   }),
 
@@ -124,9 +159,44 @@ export default {
     },
 
     startProxy() {
-      if (window.socket !== undefined) {
-        window.socket.emit("startProxy", { test: 1 })
+      this.proxy.loading = true
+      const config = {
+        settings: JSON.parse(localStorage.getItem("settings") ?? "{}"),
+        moduleConfigs: JSON.parse(localStorage.getItem("moduleConfigs") ?? "{}"),
+        serverConfig: this.serverConfig,
       }
+      if (window.socket !== undefined) {
+        window.socket.emit("startProxy", config)
+        window.socket.on("proxyStarted", () => {
+          this.proxy.loading = false
+          this.proxy.started = true
+          this.proxy.startedAt = Date.now()
+          setInterval(() => {
+            this.proxy.startedAtHumanized = this.getTimeSince(this.proxy.startedAt)
+          }, 1000)
+        })
+      }
+    },
+
+    stopProxy() {
+      if (window.socket !== undefined) {
+        window.socket.emit("stopProxy")
+        this.proxy.started = false
+      }
+    },
+
+    getTimeSince(stamp) {
+      let s = new Date().getTime() - stamp
+      const ms = s % 1000
+      s = (s - ms) / 1000
+      let secs = s % 60
+      s = (s - secs) / 60
+      let mins = s % 60
+      let hrs = (s - mins) / 60
+      hrs = hrs.toString().padStart(2, "0")
+      mins = mins.toString().padStart(2, "0")
+      secs = secs.toString().padStart(2, "0")
+      return `${hrs}:${mins}:${secs}`
     }
   },
 

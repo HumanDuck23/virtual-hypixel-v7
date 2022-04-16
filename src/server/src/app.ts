@@ -10,6 +10,9 @@ const server = http.createServer(app)
 const { Server } = require("socket.io")
 const io = new Server(server, { cors: { origin: "http://localhost:3000" } })
 
+const { VirtualHypixel } = require("./proxy/VirtualHypixel")
+const vh = new VirtualHypixel()
+
 const port = 6969
 
 app.use(function (req: any, res: any, next: any) {
@@ -37,6 +40,14 @@ io.on("connection", (socket: any) => {
 
     socket.on("startProxy", (config: any) => {
         // Start the proxy here
+        vh.on("started", () => {
+            socket.emit("proxyStarted")
+        })
+        vh.start(config)
+    })
+
+    socket.on("stopProxy", () => {
+        vh.stop()
     })
 
     socket.on("getModules", (path_: string) => {
