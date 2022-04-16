@@ -1,9 +1,12 @@
 import { VirtualHypixelConfig } from "./interfaces/VirtualHypixelConfig"
+import { ModuleInterface } from "./interfaces/modules/ModuleInterface"
 import { InstantConnectProxy } from "prismarine-proxy"
 import { Client } from "minecraft-protocol"
 import { Logger } from "./utils/Logger"
 
 import  { EventEmitter } from "events"
+import * as fs from "fs"
+import * as path from "path"
 
 /**
  * Main Virtual Hypixel Class
@@ -17,6 +20,9 @@ export class VirtualHypixel extends EventEmitter {
     proxy: InstantConnectProxy | null = null
     client: Client | null = null
     packetsStarted: boolean = false
+
+    // modules
+    modules: ModuleInterface[] = []
 
     constructor() {
         super()
@@ -105,6 +111,36 @@ export class VirtualHypixel extends EventEmitter {
         Logger.info(`Stopping Virtual Hypixel ${this.version}...`)
         this.proxy?.server?.close()
         this.proxy = null
+    }
+
+    loadModules() {
+        Logger.info(`Loading modules...`)
+        this.modules = []
+        const moduleFolder = this.config?.settings.modules.path
+        if (moduleFolder) {
+            const modules = fs.readdirSync(moduleFolder)
+            for (const module of modules) {
+                // make sure this is a module folder
+                if (fs.lstatSync(path.join(moduleFolder, module)).isDirectory()) {
+                    try {
+                        const moduleManifest = JSON.parse(fs.readFileSync(path.join(moduleFolder, module, "manifest.json")).toString())
+                        const moduleConfig = JSON.parse(fs.readFileSync(path.join(moduleFolder, module, "config.json")).toString())
+                        const classPath = path.join(moduleFolder, module, "index.js")
+                        Logger.info(`Loading class ${classPath}...`)
+                        const moduleClass = require(classPath)
+                        this.modules.push({
+                            manifest: moduleManifest,
+                            config: moduleConfig,
+                            instance: new moduleClass(this.config?.moduleConfigs[moduleManifest.id])
+                        })
+                        Logger.info(`Loaded module ${moduleManifest.name}`)
+                    } catch (e) {
+                        Logger.error(`Error while loading module ${module}: ${e}`)
+                        console.log(e)
+                    }
+                }
+            }
+        }
     }
 
 }
