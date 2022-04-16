@@ -1,5 +1,16 @@
 <template>
   <v-card class="ma-5">
+    <v-card-title>Modules</v-card-title>
+    <v-card-text>
+      <v-text-field
+        label="Modules Folder"
+        v-model="settings.modules.path"
+        prepend-icon="mdi-folder-outline"
+        color="accent"
+      />
+    </v-card-text>
+  </v-card>
+  <v-card class="ma-5">
     <v-card-title>Accounts</v-card-title>
     <v-card-text>
       <v-container fluid>
@@ -70,7 +81,10 @@ export default {
           email: "",
           password: ""
         }
-      ]
+      ],
+      modules: {
+        path: ""
+      }
     },
 
     confirmDeleteDialog: false,
@@ -98,7 +112,7 @@ export default {
         this.toDelete = -1
         this.confirmDeleteDialog = false
       }
-    }
+    },
   },
 
   watch: {
