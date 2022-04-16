@@ -42,6 +42,7 @@ io.on("connection", (socket: any) => {
         // Start the proxy here
         vh.on("started", () => {
             socket.emit("proxyStarted")
+            vh.loadModules()
         })
         vh.start(config)
     })
