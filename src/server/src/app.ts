@@ -1,3 +1,6 @@
+const fs = require("fs")
+const path = require("path")
+
 const express = require("express")
 const app = express()
 
@@ -34,6 +37,27 @@ io.on("connection", (socket: any) => {
 
     socket.on("startProxy", (config: any) => {
         // Start the proxy here
+    })
+
+    socket.on("getModules", (path_: string) => {
+        if (fs.existsSync(path_)) {
+            const dir = fs.readdirSync(path_)
+            const list = []
+            for (const module of dir) {
+                const m = {
+                    manifest: {},
+                    config: {}
+                }
+                const moduleManifest = JSON.parse(fs.readFileSync(path.join(path_, module, "manifest.json")).toString())
+                const moduleConfig = JSON.parse(fs.readFileSync(path.join(path_, module, "config.json")).toString())
+                m.manifest = moduleManifest
+                m.config = moduleConfig
+                list.push(m)
+            }
+            socket.emit("moduleResponse", list)
+        } else {
+            socket.emit("moduleResponse", false)
+        }
     })
 })
 
