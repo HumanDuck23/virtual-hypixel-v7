@@ -23,7 +23,7 @@
               class="mb-n10"
             ></v-checkbox>
             <v-spacer />
-            <v-btn icon="mdi-cog-outline"></v-btn>
+            <v-btn icon="mdi-cog-outline" :to="`/module/${module.manifest.id}`"></v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
