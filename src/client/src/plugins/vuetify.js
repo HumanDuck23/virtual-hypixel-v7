@@ -12,7 +12,7 @@ const lightTheme = {
         surface: "#fff",
         primary: "#5d25fd",
         secondary: "#4056F4",
-        accent: "#FFFD82"
+        accent: "#FDD835"
     }
 }
 
