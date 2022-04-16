@@ -47,7 +47,7 @@ export class VirtualHypixel {
                     if (this.config?.settings) {
                         setTimeout(() => {
                             this.client?.end("§cNo credentials were found for this account!")
-                        }, 500)
+                        }, 1000)
                         return {
                             username: this.config.settings.accounts[0].email,
                             password: this.config.settings.accounts[0].password,
