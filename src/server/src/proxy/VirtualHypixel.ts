@@ -1,7 +1,7 @@
 import { VirtualHypixelConfig } from "./interfaces/VirtualHypixelConfig"
 import { ModuleInterface } from "./interfaces/modules/ModuleInterface"
 import { InstantConnectProxy } from "prismarine-proxy"
-import { Client } from "minecraft-protocol"
+import { Client, PacketMeta } from "minecraft-protocol"
 import { Logger } from "./utils/Logger"
 
 import  { EventEmitter } from "events"
@@ -39,6 +39,16 @@ export class VirtualHypixel extends EventEmitter {
                 this.client = client
 
                 Logger.info(`Logging in as ${this.client.profile.name}...`)
+
+                this.client.on("end", () => {
+                    this.packetsStarted = false
+                    for (const module of this.modules) {
+                        if (module.instance.onDisconnect !== undefined && typeof module.instance.onDisconnect === "function") {
+                            module.instance.onDisconnect()
+                        }
+                    }
+                    this.emit("clientEnd")
+                })
 
                 let credentials = null
                 if (this.config?.settings) {
@@ -88,7 +98,18 @@ export class VirtualHypixel extends EventEmitter {
         // @ts-ignore
         this.proxy.on("incoming", (data, meta, toClient, toServer) => {
             try {
-                toClient.write(meta.name, data)
+                if (!this.packetsStarted) {
+                    this.packetsStarted = true
+                    for (const module of this.modules) {
+                        if (module.instance.onConnect !== undefined && typeof module.instance.onConnect === "function") {
+                            module.instance.onConnect()
+                        }
+                    }
+                    this.emit("clientConnect")
+                }
+
+                const handled = this.handlePacket(meta, data, toServer, false)
+                if (!handled.intercept) toClient.write(handled.meta.name, handled.data)
             } catch (e) {
                 Logger.error(`Error while writing to client: ${e}`)
             }
@@ -97,7 +118,8 @@ export class VirtualHypixel extends EventEmitter {
         // @ts-ignore
         this.proxy.on("outgoing", (data, meta, toClient, toServer) => {
             try {
-                toServer.write(meta.name, data)
+                const handled = this.handlePacket(meta, data, toServer, true)
+                if (!handled.intercept) toServer.write(handled.meta.name, handled.data)
             } catch (e) {
                 Logger.error(`Error while writing to server: ${e}`)
             }
@@ -105,6 +127,35 @@ export class VirtualHypixel extends EventEmitter {
 
         Logger.info(`Virtual Hypixel ${this.version} started!`)
         this.emit("started")
+    }
+
+    handlePacket(meta: PacketMeta, data: any, toServer: Client, out: boolean): { intercept: boolean, meta: PacketMeta, data: any } {
+        let intercept = false
+
+        for (const module of this.modules) {
+            let applied = [false, data]
+            if (out) {
+                if (module.instance.onOutPacket !== undefined && typeof module.instance.onOutPacket === "function") {
+                    applied = module.instance.onOutPacket(meta, data, toServer, this.client)
+                    if (applied[0]) {
+                        intercept = true
+                    } else {
+                        data = applied[1]
+                    }
+                }
+            } else {
+                if (module.instance.onInPacket !== undefined && typeof module.instance.onInPacket === "function") {
+                    applied = module.instance.onInPacket(meta, data, toServer, this.client)
+                    if (applied[0]) {
+                        intercept = true
+                    } else {
+                        data = applied[1]
+                    }
+                }
+            }
+        }
+
+        return { intercept, meta, data }
     }
 
     stop() {
