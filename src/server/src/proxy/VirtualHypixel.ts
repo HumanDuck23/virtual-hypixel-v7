@@ -3,10 +3,12 @@ import { InstantConnectProxy } from "prismarine-proxy"
 import { Client } from "minecraft-protocol"
 import { Logger } from "./utils/Logger"
 
+import  { EventEmitter } from "events"
+
 /**
  * Main Virtual Hypixel Class
  */
-export class VirtualHypixel {
+export class VirtualHypixel extends EventEmitter {
 
     version = "v7-1.0-beta"
     config: VirtualHypixelConfig | null = null
@@ -15,6 +17,11 @@ export class VirtualHypixel {
     proxy: InstantConnectProxy | null = null
     client: Client | null = null
     packetsStarted: boolean = false
+
+    constructor() {
+        super()
+    }
+
 
     start(config: VirtualHypixelConfig) {
         this.config = config
@@ -91,6 +98,7 @@ export class VirtualHypixel {
         })
 
         Logger.info(`Virtual Hypixel ${this.version} started!`)
+        this.emit("started")
     }
 
     stop() {
