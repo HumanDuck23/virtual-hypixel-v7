@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import * as io from "socket.io-client"
+
 export default {
   name: "App",
 
@@ -30,6 +32,7 @@ export default {
 
   mounted() {
     this.$vuetify.theme.current = localStorage.getItem("theme") ?? "darkTheme"
+    window.socket = io.io("http://localhost:6969")
   },
 
   methods: {

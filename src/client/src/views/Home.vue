@@ -68,8 +68,6 @@
 </template>
 
 <script>
-import * as io from "socket.io-client"
-
 export default {
   name: "Home",
 
@@ -84,11 +82,9 @@ export default {
       started: false,
       startedAt: 0,
     },
-    socket: null
   }),
 
   mounted() {
-    this.socket = io.io("http://localhost:6969")
     if (localStorage.getItem("serverConfig")) {
       this.serverConfig = JSON.parse(localStorage.getItem("serverConfig"))
     }
@@ -128,8 +124,8 @@ export default {
     },
 
     startProxy() {
-      if (this.socket !== null) {
-        this.socket.emit("startProxy", { test: 1 })
+      if (window.socket !== null) {
+        window.socket.emit("startProxy", { test: 1 })
       }
     }
   },
